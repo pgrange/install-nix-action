@@ -1,11 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "::group::Checking for nix $(which nix)"
+if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
+  . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
+fi
+
+echo "::group::Checking for nix"
 
 if which nix ; then
   echo "Aborting: Nix is already installed at $(which nix)"
   exit
+else
+  echo "I did not find nix"
+  set
 fi
 
 # GitHub command to put the following log messages into a group which is collapsed by default
@@ -37,7 +44,7 @@ if [[ ! $INPUT_EXTRA_NIX_CONFIG =~ "experimental-features" ]]; then
   add_config "experimental-features = nix-command flakes"
 fi
 
-# Nix installer flags
+# Nix ienstaller flags
 installer_options=(
   --no-channel-add
   --darwin-use-unencrypted-nix-store-volume
